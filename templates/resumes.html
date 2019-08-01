@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Datatables Example</title>
+  <meta charset="utf-8">
+ <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css"/>
+  <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+  <script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+  
+</head>
+<body>
+<h1>Skill Summary Page</h1>
+<table id="example" class="display" style="width:100%" border="1">
+        <thead>
+            <tr>
+                <th>Matching Skill#</th>
+                <th>Skills</th>
+                <th>Candidates#</th>
+            </tr>
+        </thead>
+        <tbody>
+    </tbody>
+        <tfoot>
+            <tr>
+                <th>Matching Skill#</th>
+                <th>Skills</th>
+                <th>Candidates#</th>
+            </tr>
+        </tfoot>
+    </table>
+<script>
+
+$(document).ready(function() {
+    $.ajax({
+      type: "GET",
+      url: "/resume", 
+      "dataType": "json",
+      success: function(result) {
+        console.log('result :', result);
+        //console.log('result1 :', JSON.parse(result.category));
+        
+        //c=result.category;
+        //r = '{"data": {"../ncr-resumes/AnuradhaChauhan_AutomationTesting_Accenture_Gurgaon.docx": {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, "../ncr-resumes/Shruti_Sharma__Resume.docx": {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, "../ncr-resumes/Amber Bhaumik - 3.9 years experience - Testing.doc": {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, "../ncr-resumes/Sumit Kumars CV .pdf": {"missing": 0, "Java": 1, "Tomcat": 1, "total": 2, "matchingSkills": 2}, "../ncr-resumes/Agam Singh Narula latest updated..docx": {"missing": 1, "Java": 2, "Tomcat": null, "total": 2, "matchingSkills": 1}, "../ncr-resumes/Resume_HarshalSharma_19_Mar_2018.pdf": {"missing": 1, "Java": 6, "Tomcat": null, "total": 6, "matchingSkills": 1}, "../ncr-resumes/Pankaj.docx": {"missing": 0, "Java": 1, "Tomcat": 2, "total": 3, "matchingSkills": 2}, "../ncr-resumes/resume18.3.pdf": {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, "../ncr-resumes/MonikaJindal.doc": {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, "../ncr-resumes/Manbir Singh Cheema - IT Analyst_Java_5+yrs.docx": {"missing": 0, "Java": 10, "Tomcat": 2, "total": 12, "matchingSkills": 2}, "../ncr-resumes/Raquib_Resume.pdf": {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, "../ncr-resumes/Saandhya Shree.doc": {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, "../ncr-resumes/Resumejava.docx": {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, "../ncr-resumes/Job Junction  - File to Update - 26th March.pdf": {"missing": 1, "Java": 21, "Tomcat": null, "total": 21, "matchingSkills": 1}, "../ncr-resumes/Resumejava1.docx": {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, "../ncr-resumes/MCA_2+_years_exp_(Vicky_Rajput).pdf": {"missing": 1, "Java": null, "Tomcat": 1, "total": 1, "matchingSkills": 1}, "../ncr-resumes/Resume_Premkumar.docx": {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, "../ncr-resumes/Aanu111 Resume .doc": {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, "../ncr-resumes/Dev-2018.doc": {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, "../ncr-resumes/Surabhi_Nag 2 2.docx": {"missing": 0, "Java": 13, "Tomcat": 1, "total": 14, "matchingSkills": 2}}, "category": {"0": {"no_match": {"skills": [], "candidates": [{"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}, {"missing": 2, "Java": null, "Tomcat": null, "total": 0, "matchingSkills": 0}]}}, "2": {"JavaTomcat": {"skills": ["Java", "Tomcat"], "candidates": [{"missing": 0, "Java": 1, "Tomcat": 2, "total": 3, "matchingSkills": 2}, {"missing": 0, "Java": 10, "Tomcat": 2, "total": 12, "matchingSkills": 2}, {"missing": 0, "Java": 13, "Tomcat": 1, "total": 14, "matchingSkills": 2}]}}, "1": {"Java": {"skills": ["Java"], "candidates": [{"missing": 1, "Java": 6, "Tomcat": null, "total": 6, "matchingSkills": 1}, {"missing": 1, "Java": 21, "Tomcat": null, "total": 21, "matchingSkills": 1}]}, "Tomcat": {"skills": ["Tomcat"], "candidates": [{"missing": 1, "Java": null, "Tomcat": 1, "total": 1, "matchingSkills": 1}]}}}}';
+        c=result;
+        //$output = "";
+        Object.keys(c).forEach(function(k1){
+            v2=c[k1]
+            Object.keys(v2).forEach(function(k2){
+                console.log('skill# :' +k1 + ', ' + k2 + ' - ' + v2[k2].skills + ' - ' + v2[k2].candidates.length);
+                
+                        //var tableRef = document.getElementById('example').getElementsByTagName('tbody')[0];
+                        $output =
+                        "<tr>" + 
+                        "<td align=centre>" + k1 + "</td>" +
+                        "<td>" + v2[k2].skills + "</td>" +
+                        "<td><a href=/details?param=" + k1 + "-" + k2 + ">" + v2[k2].candidates.length + "</a></td>" + 
+                        "</tr>"
+            $("table tbody").append($output);
+            });
+        });
+        //console.log($output)  
+      //$("#example > tbody ").append($output);
+    }
+} );    
+} );
+</script>
+</body>
+</html>
