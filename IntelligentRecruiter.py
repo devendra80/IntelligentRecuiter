@@ -1,4 +1,4 @@
-import nltk, subprocess, glob, sys
+import nltk, glob, sys
 
 from PDF2TextConverter import convertPDFToText
 from Docx2TextConverter import convertDocxToText
@@ -9,15 +9,20 @@ import json
 
 import textract 
 
+#resume_repo = "../ncr-resumes/";
+#resume_repo = "../resumes/test-resume/";
+#resume_repo = '../resumes/v2/'
+resume_repo = '../resumes/v3/'
+#skill_resource = 'java-skills.txt'
+skill_resource = 'myncr-testing-skills.txt'
+
 class FileProcessor():
     def __init__(self, verbose=False):
         
         print('Starting Programme')
-        file4RequiredSkills = "java-skills.txt"
+        file4RequiredSkills = skill_resource
         allowedFileExt = {"doc", "docx", "pdf", "rtf"}
-        #resumeFolder = "../ncr-resumes/";
-        #resumeFolder = "../resumes/test-resume/";
-        resumeFolder = "../resumes/v2/"
+        resumeFolder = resume_repo
         self.skills = self.readRequiredSkills(file4RequiredSkills) 
         t2 = self.skills
         print("....", t2)
@@ -35,11 +40,13 @@ class FileProcessor():
         print ("%d files identified" %len(files))
         
         for f in files:
-            print("Reading File %s"%f)
+            #print("Reading File %s"%f)
             info = {}
 
-            self.inputString, info['extension'] = self.readFile(f)  
-            #print('full text in result ', '\n', self.inputString)
+            self.inputString, info['extension'] = self.readFile(f) 
+            if info['extension'] == 'doc':
+                #print('full text in result ', '\n', self.inputString)
+                print('file 2 read ', f)
             info['fileName'] = f
             
             #self.tokenize(self.inputString)
@@ -48,7 +55,10 @@ class FileProcessor():
             self.candidateSkills = self.tokenize(self.inputString.upper())
             
             t1 = self.candidateSkills
-            self.getStats(t1, t2, f)
+            if t2 is None:
+                print(self.skills, f)
+            else:
+                self.getStats(t1, t2, f)
             
         #print(self.summary)
         self.write2Afile()
@@ -63,11 +73,11 @@ class FileProcessor():
 #Copy and paste
         
     def getStats(self, fContent, toSearch, fPath):
-        print(toSearch, type(toSearch))
+        #print(toSearch, type(toSearch))
         cnt = dict(Counter(fContent))
-        print(cnt)
+        #print(cnt)
         skillLen = len(toSearch)
-        print('skillLen :', skillLen)
+        #print('skillLen :', skillLen)
         
         p = {'missing' : 0}
         c = 0
@@ -81,7 +91,7 @@ class FileProcessor():
             else:
                 p['missing'] = p['missing'] + 1
         
-        print(fPath, "====", lst)
+        #print(fPath, "====", lst)
         p['total'] = c
         p['matchingSkills'] = skillLen - p['missing']
         #p['missing'] = c
@@ -90,16 +100,20 @@ class FileProcessor():
         k = 'no_match'
         if(len(lst) > 0 ):
             k = "".join(lst)
-        print('docs :', docs)
-        print('lst :', lst, k)
+        #print('docs :', docs)
+        #print('lst :', lst, k)
         if(docs == None):
             #docs = []
             #self.summary['category'][p['matchingSkills']] = docs
             docs = {k : {'skills' : lst, 'candidates': [], 'files': []}}
             self.summary['category'][p['matchingSkills']] = docs
+            cds = docs.get(k)
+            cds['candidates'].append(p)
+            cds['files'].append(fPath)
+            #print('post1 cds :', cds)
         else:
             cds = docs.get(k)
-            #print('cds :', cds)
+            #print('pre cds :', cds)
             if(cds == None):
                 cds = {}
                 docs[k] = cds
@@ -108,7 +122,7 @@ class FileProcessor():
                 cds['files'] = []
             cds['candidates'].append(p)
             cds['files'].append(fPath)
-        
+            #print('post2 cds :', cds)
         #docs.append(p)
         #print(p)
         
@@ -118,19 +132,16 @@ class FileProcessor():
     def preprocess(self, document):
         #print('preprocess started')
         try:
-            try:
-                document = document.decode('ascii', 'ignore')
-            except:
-                document = document.encode('ascii', 'ignore')
+            encodedDocument = document
+            if isinstance(document, (bytes, bytearray)):
+                encodedDocument = document.decode()
             
-            lines = [el.strip() for el in document.splitlines() if len(el) > 0]  # Splitting on the basis of newlines 
+            lines = [el.strip() for el in encodedDocument.splitlines() if len(el) > 0]  # Splitting on the basis of newlines 
             
-            lines = [nltk.word_tokenize(str(el, 'utf-8')) for el in lines ]
-            
+            lines = [nltk.word_tokenize(el) for el in lines ]
             lines = [nltk.pos_tag(el) for el in lines]  # Tag them
-            
-            sentences = nltk.sent_tokenize(document.decode('utf-8'))    # Split/Tokenize into sentences (List of strings)
-            
+
+            sentences = nltk.sent_tokenize(encodedDocument)
             sentences = [nltk.word_tokenize(sent) for sent in sentences]    # Split/Tokenize sentences into words (List of lists of strings)
             words = sentences
             
@@ -141,7 +152,8 @@ class FileProcessor():
             
             return words
         except Exception as e:
-            print(e)
+            #print('got error in preprocess :', e, '\n', document)
+            print('got error in preprocess :', e)
             
     def tokenize(self, inputString):
         try:
@@ -159,7 +171,7 @@ class FileProcessor():
             f.close() 
             return string, extension
         elif extension == "doc":
-            #print('reading doc file')
+            print('reading doc file', fileName)
             #return subprocess.Popen(['antiword', fileName], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0], extension
             return textract.process(fileName, extension='doc'), extension
         elif extension == "docx":
@@ -176,7 +188,7 @@ class FileProcessor():
                 return ''
                 pass
         else:
-            print('Unsupported format')
+            print('Unsupported format :', fileName)
             return '', ''
         
         
