@@ -18,16 +18,18 @@
     var user = JSON.parse('{{ data | tojson | safe}}');
     console.log('user :' + user)
     u = '<table border="1">';
-    u = u + '<tr>' 
-        +  '<th>' + 'Resume' + '</th>' 
-        +  '<th>' + 'Best Fit % [ Java]' + '</th>' 
-        +  '<th>' + 'Best Fit % [ Tomcat]' + '</th>' 
-        +  '</tr>';
+    u = u + '<tr>'
+    + '<th>' + 'Resume' + '</th>' ; 
+    Object.keys(user["skills"]).forEach(function(k2){
+        u = u +  '<th>' + 'Best Fit % [ ' + user["skills"][k2] + ' ]</th>' ;
+    });
+    u = u + '</tr>';
     Object.keys(user["files"]).forEach(function(k1){
         u = u + '<tr>' 
-        +  '<td>' + user["files"][k1] + '</td>' 
-        +  '<td>' + user["fit"][k1]['Java'] + '</td>'
-        +  '<td>' + user["fit"][k1]['Tomcat'] + '</td>'
+        +  '<td>' + user["files"][k1] + '</td>';
+        Object.keys(user["fit"][k1]).forEach(function(k3){ 
+        u = u + '<td>' + user["fit"][k1][k3] + '</td>';
+        });
         +  '</tr>';
     });
     u = u +'</table>';
