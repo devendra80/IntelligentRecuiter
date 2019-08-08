@@ -3,30 +3,11 @@ import time
 import json
 #from AsyncTask import AsyncGitTask
 
-data = {
-  "data": [
-    {
-      "id": "1",
-      "name": "Tiger Nixon",
-      "position": "System Architect",
-      "salary": "$320,800",
-      "start_date": "2011/04/25",
-      "office": "Edinburgh",
-      "extn": "5421"
-    },
-    {
-      "id": "2",
-      "name": "Garrett Winters",
-      "position": "Accountant",
-      "salary": "$170,750",
-      "start_date": "2011/07/25",
-      "office": "Tokyo",
-      "extn": "8422"
-    }]
-}
- 
 
 app = Flask(__name__)
+output_resource = 'output.txt'
+#skill_resource = 'java-skills.txt'
+skill_resource = 'myncr-testing-skills.txt'
 
 @app.route("/")
 def home():
@@ -42,7 +23,7 @@ def home2():
 
 @app.route("/resume")
 def get_resumes():
-    f = open('output.txt', 'r')
+    f = open(output_resource, 'r')
     string = f.read()
     f.close() 
     #params = {   'api_key': '{API_KEY}'  }
@@ -51,61 +32,65 @@ def get_resumes():
     print('json.dumps(string) :', j["category"])
     return j["category"]
 
+def getBestFit(skillMaxScore, candidates):
+    skInfo = []
+    for k in candidates:
+        candidateFit = {}
+        for s in skillMaxScore:
+            if isinstance(k[s], (int, float)):
+                j = k[s] * 100 / skillMaxScore[s]; 
+                candidateFit[s] = j
+            else:
+                candidateFit[s] = 0
+        
+        skInfo.append(candidateFit)
+    print(skInfo)
+    return skInfo
+    
+def getScores(skillFile, candidates):
+    f1 = open(skillFile, 'r')
+    sk1 = f1.read()
+    print(sk1)
+    sk1.split("\n")
+    skillList = sk1.split("\n")
+    f1.close()
+    skillMaxScore={}
+    for s in skillList:
+        skillMaxScore[s] = 1
+    
+    for k in candidates:
+        #print(k['Java'], k['Tomcat'])
+        for skill in skillMaxScore:
+            if isinstance(k[skill], (int, float)) and k[skill] > skillMaxScore[skill]:
+                skillMaxScore[skill] = k[skill]
+                #print(skill, k[skill])
+        
+    print('max value :', skillMaxScore)
+    return skillList, skillMaxScore
+        
 @app.route("/details/")
 def get_resume_details():
     param = request.args.get('param')
     print('param :', param)
     var = param.split("-")
     print(var[0], var[1])
-    f = open('output.txt', 'r')
+    f = open(output_resource, 'r')
     string = f.read()
     f.close() 
     
-    f1 = open('java-skills.txt', 'r')
-    sk1 = f1.read()
-    f1.close() 
-    
-    #params = {   'api_key': '{API_KEY}'  }
-    #return json.dumps(data)
+
     j = json.loads(string)
-    '''j1 = json.loads(sk1)
-    print('json.loads(string) :', j["category"][var[0]][var[1]]["files"])
-    '''
-    #return j["category"][var[0]][var[1]]["files"]
-    '''info = {}
-    for f in j["category"][var[0]][var[1]]["files"]:
-        info[f] = []
-        for a in j1:
-            info[f].append(10)
-            '''
-    #return render_template('details.html',data=j["category"][var[0]][var[1]]["files"])
-    print('info :', j["category"][var[0]][var[1]]["files"])
-    print('info :', j["category"][var[0]][var[1]]["candidates"])
+    
+    #print('info :', j["category"][var[0]][var[1]]["files"])
+    #print('info :', j["category"][var[0]][var[1]]["candidates"])
     info = {}
     info['files'] = j["category"][var[0]][var[1]]["files"]
-    maxJava = 1
-    maxTomact = 1
-    for k in j["category"][var[0]][var[1]]["candidates"]:
-        print(k['Java'], k['Tomcat'])
-        if isinstance(k['Java'], (int, float)) and k['Java'] > maxJava:
-            maxJava = k['Java']
-            print("k['Java']", k['Java'])
-        if isinstance(k['Tomcat'], (int, float)) and  k['Tomcat'] > maxTomact:
-            maxTomact = k['Tomcat']
-            print("k['Tomcat']", k['Tomcat'])
-    print('max value :', maxJava, maxTomact)
-    skInfo = []
-    for k in j["category"][var[0]][var[1]]["candidates"]:
-        j = 0
-        t = 0
-        if isinstance(k['Java'], (int, float)):
-            j = k['Java'] * 100 / maxJava; 
-        if isinstance(k['Tomcat'], (int, float)):
-            t = k['Tomcat'] * 100 / maxTomact; 
-        skInfo.append({'Java' :  j, 'Tomcat' :  t})
-    print(skInfo)
-    info['fit'] = skInfo
-    #return render_template('details.html',data=j["category"][var[0]][var[1]]["files"])
+
+    skillList, skillMaxScore=getScores(skill_resource, j["category"][var[0]][var[1]]["candidates"])
+   
+    info['fit'] = getBestFit(skillMaxScore, j["category"][var[0]][var[1]]["candidates"])
+    info['skills'] = skillList
+
     return render_template('details.html',data=info)
 
 
